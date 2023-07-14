@@ -56,6 +56,20 @@ void updateMenu(bool state_changed = false) {
     }
 }
 
+void lcd_pointer(bool first_row = true) {
+    if(first_row) {
+        lcd.setCursor(0,0);
+        lcd.print("> ");
+        lcd.setCursor(0,1);
+        lcd.print("  ");
+    } else {
+        lcd.setCursor(0,0);
+        lcd.print("  ");
+        lcd.setCursor(0,1);
+        lcd.print("> ");
+    }
+}
+
 
 void setup() {
     lcd.begin(LCD_columns, LCD_rows); // set up the LCD's number of columns and rows
@@ -77,7 +91,7 @@ void loop() {
     right_btn.tick(keys.status(4));
 
     DateTime now = rtc.now();
-    
+
     if(second != now.second()) {
         char date_time[] = "DD/MM  hh:mm:ss";
         now.toString(date_time);
