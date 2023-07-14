@@ -1,5 +1,7 @@
 #include <LiquidCrystal.h>
 #include "RTClib.h"
+#include <AnalogKey.h>
+#include <EncButton.h>
 
 
 #define LCD_columns 16
@@ -18,6 +20,14 @@ RTC_DS1307 rtc;
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
+int16_t sigs[5] = {640, 411, 257, 100, 0}; // array of signal value of buttons
+AnalogKey<A0, 5, sigs> keys; // pin of button, number of buttons, array of signal
+
+EncButton<EB_TICK, VIRT_BTN> select_btn;
+EncButton<EB_TICK, VIRT_BTN> left_btn;
+EncButton<EB_TICK, VIRT_BTN> down_btn;
+EncButton<EB_TICK, VIRT_BTN> up_btn;
+EncButton<EB_TICK, VIRT_BTN> right_btn;
 
 void setup() {
     lcd.begin(LCD_columns, LCD_rows); // set up the LCD's number of columns and rows
@@ -32,6 +42,12 @@ void setup() {
 }
 
 void loop() {
+    select_btn.tick(keys.status(0));
+    left_btn.tick(keys.status(1));
+    down_btn.tick(keys.status(2));
+    up_btn.tick(keys.status(3));
+    right_btn.tick(keys.status(4));
+
     DateTime now = rtc.now();
 
 }
