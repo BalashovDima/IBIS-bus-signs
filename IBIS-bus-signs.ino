@@ -35,12 +35,16 @@ EncButton<EB_TICK, VIRT_BTN> right_btn;
 // 1 -- main menu | pointed at 'Line' option 1st row . 'Other text' 2nd row
 // 2 -- main menu | 'Line' option 1st row . pointed at 'Other text' 2nd row
 // 3 -- main menu | pointed at 'Time settings' option 1st row. 2nd row empty
+// 100 -- line setting | Line <number>. Number of line can be change with up and down buttons 
 
 uint16_t state = 0;
 String date_and_time;
 String current_sign_text = "Line 1";
 
 uint8_t second = 0;
+
+int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
+uint8_t line_index = 0;
 
 void updateMenu(bool state_changed = false) {
     if(state_changed) lcd.clear();
@@ -67,6 +71,16 @@ void updateMenu(bool state_changed = false) {
         case 3:
             lcd.setCursor(0,0);
             lcd.print("> Time settings");
+            break;
+        case 100:
+            lcd.setCursor(0,0);
+            lcd.print("Line");
+            lcd.setCursor(5,0);
+            lcd.print("    ");
+            lcd.setCursor(5,0);
+            lcd.print(lines[line_index]);
+            lcd.setCursor(0,1);
+            lcd.print("use UP&DOWN");
             break;
         default:
             break;
@@ -113,9 +127,9 @@ void loop() {
     } else if(state <= 3) {
         if(select_btn.click()) {
             switch(state) {
-                case 1:
-                    // state = ;
-                    // updateMenu(true);
+                case 1: // enter line settings
+                    state = 100;
+                    updateMenu(true);
                     break;
                 case 2:
                     // state = ;
@@ -132,6 +146,18 @@ void loop() {
         } else if(up_btn.click()) {
             state - 1 < 1 ? state = 3 : state--;
             updateMenu(true);
+        }
+    } else if(state == 100) {
+        if(select_btn.click()) {
+            current_sign_text = "Line " + String(lines[line_index]);
+            state = 0;
+            updateMenu(true);
+        } else if(up_btn.click()) {
+            line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
+            updateMenu();
+        } else if(down_btn.click()) {
+            line_index - 1 <= 0 ? line_index = sizeof(lines) / sizeof(lines[0]) - 1 : line_index--;
+            updateMenu();
         }
     }
 
