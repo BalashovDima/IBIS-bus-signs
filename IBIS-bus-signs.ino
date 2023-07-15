@@ -192,24 +192,55 @@ void loop() {
             updateMenu(true);
         } else if(up_btn.click()) {
             if(setting_time_row == 0) { // 'date' row
+                uint8_t day_setting = setting_time.day();
+                uint8_t month_setting = setting_time.month();
+                uint8_t year_setting = setting_time.year();
                 switch(setting_time_col) {
                     case 0:
-                        
+                        if(day_setting < 31) {
+                            setting_time = setting_time.operator+(TimeSpan(864000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(2592000));
+                        }
                         break;
                     case 1:
-                        
+                        if(day_setting > 9) day_setting = day_setting % 10;
+                        if(day_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(86400));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(777600));
+                        }
                         break;
                     case 3:
-                        
+                        if(month_setting < 10) {
+                            setting_time = setting_time.operator+(TimeSpan(26300000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(26300000));
+                        }
                         break;
                     case 4:
-                        
+                        if(month_setting > 9) month_setting = month_setting % 10;
+                        if(month_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(2630000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(23670000));
+                        }
                         break;
                     case 6:
-                        
+                        year_setting = year_setting % 100;
+                        if(year_setting < 90) {
+                            setting_time = setting_time.operator+(TimeSpan(315360000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(2838240000));
+                        }
                         break;
                     case 7:
-
+                        year_setting = year_setting % 10;
+                        if(year_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(31536000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(283824000));
+                        }
                         break;
                 }
 
