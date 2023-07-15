@@ -300,7 +300,112 @@ void loop() {
 
             updateMenu();
         } else if(down_btn.click()) {
+            if(setting_time_row == 0) { // 'date' row
+                uint8_t day_setting = setting_time.day();
+                uint8_t month_setting = setting_time.month();
+                uint8_t year_setting = setting_time.year();
+                switch(setting_time_col) {
+                    case 0:
+                        if(day_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(864000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(2592000));
+                        }
+                        break;
+                    case 1:
+                        if(day_setting > 9) day_setting = day_setting % 10;
+                        if(day_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(86400));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(777600));
+                        }
+                        break;
+                    case 3:
+                        if(month_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(26300000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(26300000));
+                        }
+                        break;
+                    case 4:
+                        if(month_setting > 9) month_setting = month_setting % 10;
+                        if(month_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(2630000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(23670000));
+                        }
+                        break;
+                    case 6:
+                        year_setting = year_setting % 100;
+                        if(year_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(315360000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(2838240000));
+                        }
+                        break;
+                    case 7:
+                        year_setting = year_setting % 10;
+                        if(year_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(31536000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(283824000));
+                        }
+                        break;
+                }
 
+            } else { // 'time' row
+                uint8_t hour_setting = setting_time.hour();
+                uint8_t minute_setting = setting_time.minute();
+                uint8_t second_setting = setting_time.second();
+                switch(setting_time_col) {
+                    case 0:
+                        if(hour_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(36000));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(72000));
+                        }
+                        break;
+                    case 1:
+                        if(hour_setting > 9) hour_setting = hour_setting % 10;
+                        if(hour_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(3600));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(32400));
+                        }
+                        break;
+                    case 3:
+                        if(minute_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(600));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(3000));
+                        }
+                        break;
+                    case 4:
+                        if(minute_setting > 9) minute_setting = minute_setting % 10;
+                        if(minute_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(60));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(540));
+                        }
+                        break;
+                    case 6:
+                        if(second_setting > 9) {
+                            setting_time = setting_time.operator-(TimeSpan(10));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(50));
+                        }
+                        break;
+                    case 7:
+                        if(second_setting > 9) second_setting = second_setting % 10;
+                        if(second_setting > 0) {
+                            setting_time = setting_time.operator-(TimeSpan(1));
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(9));
+                        }
+                        break;
+                }
+
+            }
             updateMenu();
         } else if(right_btn.click()) {
             if(setting_time_row == 0) {
