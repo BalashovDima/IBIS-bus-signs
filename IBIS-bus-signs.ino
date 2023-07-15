@@ -36,6 +36,7 @@ EncButton<EB_TICK, VIRT_BTN> right_btn;
 // 2 -- main menu | 'Line' option 1st row . pointed at 'Other text' 2nd row
 // 3 -- main menu | pointed at 'Time settings' option 1st row. 2nd row empty
 // 100 -- line setting | Line <number>. Number of line can be change with up and down buttons 
+// 99 -- time setting | DD/MM/YY on 1st row. hh:mm:ss 2nd row. LEFT, RIGHT to go to previous, next number to change. UP, DOWN to increase, decrease
 
 uint16_t state = 0;
 String date_and_time;
@@ -43,11 +44,21 @@ String current_sign_text = "Line 1";
 
 uint8_t second = 0;
 
+DateTime setting_time;
+uint8_t setting_time_row = 1;
+uint8_t setting_time_col = 0;
+// 01234567
+// DD/MM/YY
+// hh:mm:ss
+
 int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
 uint8_t line_index = 0;
 
 void updateMenu(bool state_changed = false) {
-    if(state_changed) lcd.clear();
+    if(state_changed) {
+        lcd.noBlink();
+        lcd.clear();
+    }
 
     switch (state) {
         case 0: 
@@ -82,6 +93,14 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,1);
             lcd.print("use UP&DOWN");
             break;
+        case 99:
+            lcd.setCursor(0,0);
+            char first_row[] = "DD/MM/YY";
+            char second_row[] = "hh:mm:ss";
+            lcd.print(setting_time.toString(first_row));
+            lcd.setCursor(0,1);
+            lcd.print(setting_time.toString(second_row));
+            lcd.setCursor(setting_time_col, setting_time_row);
         default:
             break;
     }
@@ -121,10 +140,12 @@ void loop() {
     up_btn.tick(keys.status(3));
     right_btn.tick(keys.status(4));
 
+    DateTime now = rtc.now();
+
     if(state == 0 && select_btn.click()) {
         state = 1; // enters menu
         updateMenu(true);
-    } else if(state <= 3) {
+    } else if(state <= 3) { // when in main menu
         if(select_btn.click()) {
             switch(state) {
                 case 1: // enter line settings
@@ -136,8 +157,10 @@ void loop() {
                     // updateMenu(true);
                     break;
                 case 3:
-                    // state = ;
-                    // updateMenu(true);
+                    state = 99;
+                    setting_time = now;
+                    updateMenu(true);
+                    lcd.blink();
                     break;
             }
         } else if(down_btn.click()) {
@@ -147,7 +170,7 @@ void loop() {
             state - 1 < 1 ? state = 3 : state--;
             updateMenu(true);
         }
-    } else if(state == 100) {
+    } else if(state == 100) { // when in line setting
         if(select_btn.click()) {
             current_sign_text = "Line " + String(lines[line_index]);
             state = 0;
@@ -159,9 +182,102 @@ void loop() {
             line_index - 1 <= 0 ? line_index = sizeof(lines) / sizeof(lines[0]) - 1 : line_index--;
             updateMenu();
         }
+    } else if(state = 99) { // when setting time
+        // 01234567
+        // DD/MM/YY
+        // hh:mm:ss
+        if(select_btn.click()) {
+            state = 0;
+            rtc.adjust(setting_time);
+            updateMenu(true);
+        } else if(up_btn.click()) {
+            if(setting_time_row == 0) { // 'date' row
+                switch(setting_time_col) {
+                    case 0:
+                        
+                        break;
+                    case 1:
+                        
+                        break;
+                    case 3:
+                        
+                        break;
+                    case 4:
+                        
+                        break;
+                    case 6:
+                        
+                        break;
+                    case 7:
+
+                        break;
+                }
+
+            } else { // 'time' row
+                switch(setting_time_col) {
+                    case 0:
+                        
+                        break;
+                    case 1:
+                        
+                        break;
+                    case 3:
+                        
+                        break;
+                    case 4:
+                        
+                        break;
+                    case 6:
+                        
+                        break;
+                    case 7:
+
+                        break;
+                }
+
+            }
+
+            updateMenu();
+        } else if(down_btn.click()) {
+
+            updateMenu();
+        } else if(right_btn.click()) {
+            if(setting_time_row == 0) {
+                if(setting_time_col < 7) {
+                    setting_time_col++;
+                } else {
+                    setting_time_col = 0;
+                    setting_time_row = 1;
+                }
+            } else {
+                if(setting_time_col < 7) {
+                    setting_time_col++;
+                } else {
+                    setting_time_col = 0;
+                    setting_time_row = 0;
+                }
+            }
+            updateMenu();
+        } else if(left_btn.click()) {
+            if(setting_time_row == 0) {
+                if(setting_time_col > 0) {
+                    setting_time_col--;
+                } else {
+                    setting_time_col = 7;
+                    setting_time_row = 1;
+                }
+            } else {
+                if(setting_time_col > 0) {
+                    setting_time_col--;
+                } else {
+                    setting_time_col = 7;
+                    setting_time_row = 0;
+                }
+            }
+            updateMenu();
+        }
     }
 
-    DateTime now = rtc.now();
 
     if(state == 0 && second != now.second()) {
         char date_time[] = "DD/MM  hh:mm:ss";
