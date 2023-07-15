@@ -214,24 +214,54 @@ void loop() {
                 }
 
             } else { // 'time' row
+                uint8_t hour_setting = setting_time.hour();
+                uint8_t minute_setting = setting_time.minute();
+                uint8_t second_setting = setting_time.second();
                 switch(setting_time_col) {
                     case 0:
-                        
+                        if(hour_setting < 20) {
+                            setting_time = setting_time.operator+(TimeSpan(36000));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(72000));
+                        }
                         break;
                     case 1:
-                        
+                        if(hour_setting > 9) hour_setting = hour_setting % 10;
+                        if(hour_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(3600));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(32400));
+                        }
                         break;
                     case 3:
-                        
+                        if(minute_setting < 50) {
+                            setting_time = setting_time.operator+(TimeSpan(600));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(3000));
+                        }
                         break;
                     case 4:
-                        
+                        if(minute_setting > 9) minute_setting = minute_setting % 10;
+                        if(minute_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(60));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(540));
+                        }
                         break;
                     case 6:
-                        
+                        if(second_setting < 50) {
+                            setting_time = setting_time.operator+(TimeSpan(10));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(50));
+                        }
                         break;
                     case 7:
-
+                        if(second_setting > 9) second_setting = second_setting % 10;
+                        if(second_setting < 9) {
+                            setting_time = setting_time.operator+(TimeSpan(1));
+                        } else {
+                            setting_time = setting_time.operator-(TimeSpan(9));
+                        }
                         break;
                 }
 
