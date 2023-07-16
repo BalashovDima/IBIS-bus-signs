@@ -187,9 +187,16 @@ void loop() {
         // DD/MM/YY
         // hh:mm:ss
         if(select_btn.click()) {
-            state = 0;
-            rtc.adjust(setting_time);
-            updateMenu(true);
+            if(setting_time.isValid()) {
+                state = 0;
+                rtc.adjust(setting_time);
+                updateMenu(true);
+            } else {
+                lcd.setCursor(0,0);
+                lcd.print("Invalid ");
+                lcd.setCursor(0,1);
+                lcd.print("Date    ");
+            }
         } else if(up_btn.click()) {
             if(setting_time_row == 0) { // 'date' row
                 uint8_t day_setting = setting_time.day();
