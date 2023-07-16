@@ -228,20 +228,10 @@ void loop() {
                             setting_time = DateTime(year_setting, month_setting, int(day_setting/10)*10, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
-                    case 3:
-                        if(month_setting < 10) {
-                            setting_time = setting_time.operator+(TimeSpan(26300000));
-                        } else {
-                            setting_time = setting_time.operator-(TimeSpan(26300000));
-                        }
-                        break;
                     case 4:
-                        if(month_setting > 9) month_setting = month_setting % 10;
-                        if(month_setting < 9) {
-                            setting_time = setting_time.operator+(TimeSpan(2630000));
-                        } else {
-                            setting_time = setting_time.operator-(TimeSpan(23670000));
-                        }
+                        month_setting < 12 ? month_setting++ : month_setting = 1;
+
+                        setting_time = DateTime(year_setting, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         break;
                     case 6:
                         year_setting = year_setting % 100;
@@ -372,20 +362,10 @@ void loop() {
                             setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second()).operator-(TimeSpan(86400));
                         }
                         break;
-                    case 3:
-                        if(month_setting > 9) {
-                            setting_time = setting_time.operator-(TimeSpan(26300000));
-                        } else {
-                            setting_time = setting_time.operator+(TimeSpan(26300000));
-                        }
-                        break;
                     case 4:
-                        if(month_setting > 9) month_setting = month_setting % 10;
-                        if(month_setting > 0) {
-                            setting_time = setting_time.operator-(TimeSpan(2630000));
-                        } else {
-                            setting_time = setting_time.operator+(TimeSpan(23670000));
-                        }
+                        month_setting > 1 ? month_setting-- : month_setting = 12;
+
+                        setting_time = DateTime(year_setting, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         break;
                     case 6:
                         year_setting = year_setting % 100;
