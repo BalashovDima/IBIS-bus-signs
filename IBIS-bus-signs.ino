@@ -194,21 +194,31 @@ void loop() {
             if(setting_time_row == 0) { // 'date' row
                 uint8_t day_setting = setting_time.day();
                 uint8_t month_setting = setting_time.month();
-                uint8_t year_setting = setting_time.year();
+                uint16_t year_setting = setting_time.year();
+                
+                if(setting_time_col == 0) {
+                    DateTime add_ten_day = setting_time.operator+(TimeSpan(864000));
+                    if(add_ten_day.month() == month_setting) {
+                        setting_time = add_ten_day;
+                    } else if(day_setting%10 == 0){
+                        setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second());
+                    } else {
+                        setting_time = DateTime(year_setting, month_setting, day_setting%10, setting_time.hour(), setting_time.minute(), setting_time.second());
+                    }
+                }
                 switch(setting_time_col) {
-                    case 0:
-                        if(day_setting < 31) {
-                            setting_time = setting_time.operator+(TimeSpan(864000));
-                        } else {
-                            setting_time = setting_time.operator-(TimeSpan(2592000));
-                        }
-                        break;
                     case 1:
-                        if(day_setting > 9) day_setting = day_setting % 10;
-                        if(day_setting < 9) {
-                            setting_time = setting_time.operator+(TimeSpan(86400));
+                        if(day_setting % 10 < 9) {
+                            DateTime add_day = setting_time.operator+(TimeSpan(86400));
+                            if(add_day.month() == month_setting) {
+                                setting_time = add_day;
+                                break;
+                            }
+                        }
+                        if(day_setting < 10) {
+                            setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second());
                         } else {
-                            setting_time = setting_time.operator-(TimeSpan(777600));
+                            setting_time = DateTime(year_setting, month_setting, int(day_setting/10)*10, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
                     case 3:
@@ -314,21 +324,45 @@ void loop() {
             if(setting_time_row == 0) { // 'date' row
                 uint8_t day_setting = setting_time.day();
                 uint8_t month_setting = setting_time.month();
-                uint8_t year_setting = setting_time.year();
-                switch(setting_time_col) {
-                    case 0:
-                        if(day_setting > 9) {
-                            setting_time = setting_time.operator-(TimeSpan(864000));
+                uint16_t year_setting = setting_time.year();
+
+                if(setting_time_col == 0) {
+                    DateTime take_ten_day = setting_time.operator-(TimeSpan(864000));
+                    if(take_ten_day.month() == month_setting) {
+                        setting_time = take_ten_day;
+                    } else if(day_setting%10 == 0){
+                        setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second());
+                    } else {
+                        if(month_setting < 12) {
+                            month_setting++;
                         } else {
-                            setting_time = setting_time.operator+(TimeSpan(2592000));
+                            month_setting = 1;
+                            year_setting++;
                         }
-                        break;
+                        setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second()).operator-(TimeSpan(86400));
+                    }
+                }
+                switch(setting_time_col) {
                     case 1:
-                        if(day_setting > 9) day_setting = day_setting % 10;
-                        if(day_setting > 0) {
+                        if(day_setting % 10 > 0 && day_setting != 1) {
                             setting_time = setting_time.operator-(TimeSpan(86400));
+                        } else if(day_setting < 10) {
+                            setting_time = setting_time.operator+(TimeSpan(691200));
                         } else {
-                            setting_time = setting_time.operator+(TimeSpan(777600));
+                            DateTime add_nine_day = setting_time.operator+(TimeSpan(777600));
+                            
+                            if(add_nine_day.month() == month_setting) {
+                                setting_time = add_nine_day;
+                                break;
+                            } 
+
+                            if(month_setting < 12) {
+                                month_setting++;
+                            } else {
+                                month_setting = 1;
+                                year_setting++;
+                            }
+                            setting_time = DateTime(year_setting, month_setting, 1, setting_time.hour(), setting_time.minute(), setting_time.second()).operator-(TimeSpan(86400));
                         }
                         break;
                     case 3:
