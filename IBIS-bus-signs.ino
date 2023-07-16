@@ -250,13 +250,24 @@ void loop() {
                 uint8_t second_setting = setting_time.second();
                 switch(setting_time_col) {
                     case 0:
-                        if(hour_setting < 20) {
+                        if(hour_setting + 10 < 24) {
                             setting_time = setting_time.operator+(TimeSpan(36000));
+                        } else if (hour_setting < 20) {
+                            setting_time = setting_time.operator-(TimeSpan(36000));
                         } else {
                             setting_time = setting_time.operator-(TimeSpan(72000));
                         }
                         break;
                     case 1:
+                        if(hour_setting > 20) {
+                            hour_setting = hour_setting % 10;
+                            if(hour_setting < 3) {
+                                setting_time = setting_time.operator+(TimeSpan(3600));
+                            } else {
+                                setting_time = setting_time.operator-(TimeSpan(10800));
+                            }
+                            break;
+                        }
                         if(hour_setting > 9) hour_setting = hour_setting % 10;
                         if(hour_setting < 9) {
                             setting_time = setting_time.operator+(TimeSpan(3600));
@@ -361,11 +372,22 @@ void loop() {
                     case 0:
                         if(hour_setting > 9) {
                             setting_time = setting_time.operator-(TimeSpan(36000));
-                        } else {
+                        } else if(hour_setting % 10 < 4) {
                             setting_time = setting_time.operator+(TimeSpan(72000));
-                        }
+                        } else {
+                            setting_time = setting_time.operator+(TimeSpan(36000));
+                        } 
                         break;
                     case 1:
+                        if(hour_setting > 19) {
+                            hour_setting = hour_setting % 10;
+                            if(hour_setting > 0) {
+                                setting_time = setting_time.operator-(TimeSpan(3600));
+                            } else {
+                                setting_time = setting_time.operator+(TimeSpan(10800));
+                            }
+                            break;
+                        }
                         if(hour_setting > 9) hour_setting = hour_setting % 10;
                         if(hour_setting > 0) {
                             setting_time = setting_time.operator-(TimeSpan(3600));
