@@ -463,37 +463,49 @@ void loop() {
 
             }
             updateMenu();
-        } else if(right_btn.click()) {
+        } else if(right_btn.click()) { // to next date/time parameter
             if(setting_time_row == 0) {
-                if(setting_time_col < 7) {
+                if(setting_time_col == 0 || setting_time_col == 3 || setting_time_col == 6) {
                     setting_time_col++;
-                } else {
+                } else if(setting_time_col == 7) {
                     setting_time_col = 0;
                     setting_time_row = 1;
+                } else if(setting_time_col == 1) {
+                    setting_time_col = 4;
+                } else {
+                    setting_time_col += 2;
                 }
             } else {
-                if(setting_time_col < 7) {
+                if(setting_time_col == 0 || setting_time_col == 3 || setting_time_col == 6) {
                     setting_time_col++;
-                } else {
+                } else if(setting_time_col == 7) {
                     setting_time_col = 0;
                     setting_time_row = 0;
+                } else {
+                    setting_time_col +=2;
                 }
             }
             updateMenu();
-        } else if(left_btn.click()) {
+        } else if(left_btn.click()) { // to previous date/time parameter
             if(setting_time_row == 0) {
-                if(setting_time_col > 0) {
+                if(setting_time_col == 1 || setting_time_col == 7) {
                     setting_time_col--;
-                } else {
+                } else if(setting_time_col == 0) {
                     setting_time_col = 7;
                     setting_time_row = 1;
+                } else if(setting_time_col == 4) {
+                    setting_time_col = 1;
+                } else {
+                    setting_time_col -= 2;
                 }
             } else {
-                if(setting_time_col > 0) {
+                if(setting_time_col == 1 || setting_time_col == 4 || setting_time_col == 7) {
                     setting_time_col--;
-                } else {
+                } else if(setting_time_col == 0) {
                     setting_time_col = 7;
                     setting_time_row = 0;
+                } else {
+                    setting_time_col -= 2;
                 }
             }
             updateMenu();
