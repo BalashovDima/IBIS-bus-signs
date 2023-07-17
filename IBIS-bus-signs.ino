@@ -234,19 +234,17 @@ void loop() {
                         setting_time = DateTime(year_setting, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         break;
                     case 6:
-                        year_setting = year_setting % 100;
-                        if(year_setting < 90) {
-                            setting_time = setting_time.operator+(TimeSpan(315360000));
+                        if(year_setting < 2090) {
+                            setting_time = DateTime(year_setting+10, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         } else {
-                            setting_time = setting_time.operator-(TimeSpan(2838240000));
+                            setting_time = DateTime(2000+year_setting%10, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
                     case 7:
-                        year_setting = year_setting % 10;
-                        if(year_setting < 9) {
-                            setting_time = setting_time.operator+(TimeSpan(31536000));
+                        if(year_setting % 10 < 9) {
+                            setting_time = DateTime(year_setting+1, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         } else {
-                            setting_time = setting_time.operator-(TimeSpan(283824000));
+                            setting_time = DateTime(year_setting/10*10, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
                 }
@@ -368,19 +366,17 @@ void loop() {
                         setting_time = DateTime(year_setting, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         break;
                     case 6:
-                        year_setting = year_setting % 100;
-                        if(year_setting > 9) {
-                            setting_time = setting_time.operator-(TimeSpan(315360000));
+                        if(year_setting > 2009) {
+                            setting_time = DateTime(year_setting-10, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         } else {
-                            setting_time = setting_time.operator+(TimeSpan(2838240000));
+                            setting_time = DateTime(2090+year_setting%10, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
                     case 7:
-                        year_setting = year_setting % 10;
-                        if(year_setting > 0) {
-                            setting_time = setting_time.operator-(TimeSpan(31536000));
+                        if(year_setting % 10 > 0) {
+                            setting_time = DateTime(year_setting-1, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         } else {
-                            setting_time = setting_time.operator+(TimeSpan(283824000));
+                            setting_time = DateTime(year_setting/10*10+9, month_setting, day_setting, setting_time.hour(), setting_time.minute(), setting_time.second());
                         }
                         break;
                 }
