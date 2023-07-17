@@ -34,7 +34,8 @@ EncButton<EB_TICK, VIRT_BTN> right_btn;
 // 0 -- home | stand-by mode. not in menu. date, time and line are shown
 // 1 -- main menu | pointed at 'Line' option 1st row . 'Other text' 2nd row
 // 2 -- main menu | 'Line' option 1st row . pointed at 'Other text' 2nd row
-// 3 -- main menu | pointed at 'Time settings' option 1st row. 2nd row empty
+// 3 -- main menu | pointed at 'Interior sign' option 1st row. 'Time settings' 2nd row
+// 4 -- main menu | 'Interior sign' option 1st row. pointed at 'Time settings' 2nd row
 // 100 -- line setting | Line <number>. Number of line can be change with up and down buttons 
 // 99 -- time setting | DD/MM/YY on 1st row. hh:mm:ss 2nd row. LEFT, RIGHT to go to previous, next number to change. UP, DOWN to increase, decrease
 
@@ -81,6 +82,14 @@ void updateMenu(bool state_changed = false) {
             break;
         case 3:
             lcd.setCursor(0,0);
+            lcd.print("> Interior sign");
+            lcd.setCursor(0,1);
+            lcd.print("  Time settings");
+            break;
+        case 4:
+            lcd.setCursor(0,0);
+            lcd.print("  Interior sign");
+            lcd.setCursor(0,1);
             lcd.print("> Time settings");
             break;
         case 100:
@@ -145,7 +154,7 @@ void loop() {
     if(state == 0 && select_btn.click()) {
         state = 1; // enters menu
         updateMenu(true);
-    } else if(state <= 3) { // when in main menu
+    } else if(state <= 4) { // when in main menu
         if(select_btn.click()) {
             switch(state) {
                 case 1: // enter line settings
@@ -157,6 +166,10 @@ void loop() {
                     // updateMenu(true);
                     break;
                 case 3:
+                    // state = ;
+                    // updateMenu(true);
+                    break;
+                case 4:
                     state = 99;
                     setting_time = now;
                     updateMenu(true);
@@ -164,10 +177,10 @@ void loop() {
                     break;
             }
         } else if(down_btn.click()) {
-            state + 1 > 3 ? state = 1 : state++;
+            state + 1 > 4 ? state = 1 : state++;
             updateMenu(true);
         } else if(up_btn.click()) {
-            state - 1 < 1 ? state = 3 : state--;
+            state - 1 < 1 ? state = 4 : state--;
             updateMenu(true);
         }
     } else if(state == 100) { // when in line setting
