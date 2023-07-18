@@ -166,13 +166,19 @@ void loop() {
     up_btn.tick(keys.status(3));
     right_btn.tick(keys.status(4));
 
+    bool SELECT = select_btn.click() || select_btn.step();
+    bool LEFT = left_btn.click() || left_btn.step();
+    bool DOWN = down_btn.click() || down_btn.step();
+    bool UP = up_btn.click() || up_btn.step();
+    bool RIGHT = right_btn.click() || right_btn.step();
+
     DateTime now = rtc.now();
 
-    if(state == 0 && select_btn.click()) {
+    if(state == 0 && SELECT) {
         state = 1; // enters menu
         updateMenu(true);
     } else if(state > 0 && state <= 4) { // when in main menu
-        if(select_btn.click()) {
+        if(SELECT) {
             switch(state) {
                 case 1: // enter line settings
                     state = 100;
@@ -195,36 +201,36 @@ void loop() {
                     lcd.blink();
                     break;
             }
-        } else if(down_btn.click()) {
+        } else if(DOWN) {
             state + 1 > 4 ? state = 1 : state++;
             updateMenu(true);
-        } else if(up_btn.click()) {
+        } else if(UP) {
             state - 1 < 1 ? state = 4 : state--;
             updateMenu(true);
         }
     } else if(state == 100) { // when in line setting
-        if(select_btn.click()) {
+        if(SELECT) {
             current_sign_text = "Line " + String(lines[line_index]);
             state = 0;
             currect_text_n_function_index = 255;
             updateMenu(true);
-        } else if(up_btn.click()) {
+        } else if(UP) {
             line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
             updateMenu();
-        } else if(down_btn.click()) {
+        } else if(DOWN) {
             line_index - 1 <= 0 ? line_index = sizeof(lines) / sizeof(lines[0]) - 1 : line_index--;
             updateMenu();
         }
     } else if(state == 200) { // when setting 'Text & functions'
-        if(select_btn.click()) {
+        if(SELECT) {
             current_sign_text = text_n_functions[currect_text_n_function_index];
             state = 0;
             line_index = 255;
             updateMenu(true);
-        } else if(up_btn.click() || left_btn.click()) {
+        } else if(UP || LEFT) {
             currect_text_n_function_index < number_of_other_texts - 1 ? currect_text_n_function_index++ : currect_text_n_function_index = 0;
             updateMenu();
-        } else if(down_btn.click()  || right_btn.click()) {
+        } else if(DOWN  || RIGHT) {
             currect_text_n_function_index > 0 ? currect_text_n_function_index-- : currect_text_n_function_index = number_of_other_texts - 1;
             updateMenu();
         }
@@ -232,7 +238,7 @@ void loop() {
         // 01234567
         // DD/MM/YY
         // hh:mm:ss
-        if(select_btn.click()) {
+        if(SELECT) {
             if(setting_time.isValid()) {
                 state = 0;
                 rtc.adjust(setting_time);
@@ -243,7 +249,7 @@ void loop() {
                 lcd.setCursor(0,1);
                 lcd.print("Date    ");
             }
-        } else if(up_btn.click()) {
+        } else if(UP) {
             if(setting_time_row == 0) { // 'date' row
                 uint8_t day_setting = setting_time.day();
                 uint8_t month_setting = setting_time.month();
@@ -361,7 +367,7 @@ void loop() {
             }
 
             updateMenu();
-        } else if(down_btn.click()) {
+        } else if(DOWN) {
             if(setting_time_row == 0) { // 'date' row
                 uint8_t day_setting = setting_time.day();
                 uint8_t month_setting = setting_time.month();
@@ -492,7 +498,7 @@ void loop() {
 
             }
             updateMenu();
-        } else if(right_btn.click()) { // to next date/time parameter
+        } else if(RIGHT) { // to next date/time parameter
             if(setting_time_row == 0) {
                 if(setting_time_col == 0 || setting_time_col == 3 || setting_time_col == 6) {
                     setting_time_col++;
@@ -515,7 +521,7 @@ void loop() {
                 }
             }
             updateMenu();
-        } else if(left_btn.click()) { // to previous date/time parameter
+        } else if(LEFT) { // to previous date/time parameter
             if(setting_time_row == 0) {
                 if(setting_time_col == 1 || setting_time_col == 7) {
                     setting_time_col--;
