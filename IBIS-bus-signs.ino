@@ -53,7 +53,11 @@ uint8_t setting_time_col = 0;
 // hh:mm:ss
 
 int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
-uint8_t line_index = 0;
+uint8_t line_index = 0; // 255 when other text is displayed, otherwise the index of the line in the 'lines' array
+
+#define number_of_other_texts 7
+char text_n_functions[number_of_other_texts][16];
+uint8_t currect_text_n_function_index = 255; // 255 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
 
 void updateMenu(bool state_changed = false) {
     if(state_changed) {
@@ -72,13 +76,13 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,0);
             lcd.print("> Line");
             lcd.setCursor(0,1);
-            lcd.print("  Other text");
+            lcd.print("  Text|functions");
             break;
         case 2:
             lcd.setCursor(0,0);
             lcd.print("  Line");
             lcd.setCursor(0,1);
-            lcd.print("> Other text");
+            lcd.print("> Text|functions");
             break;
         case 3:
             lcd.setCursor(0,0);
@@ -113,6 +117,12 @@ void updateMenu(bool state_changed = false) {
         default:
             break;
     }
+
+    if(state == 200) {
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print(text_n_functions[currect_text_n_function_index]);
+    }
 }
 
 void lcd_pointer(bool first_row = true) {
@@ -140,6 +150,13 @@ void setup() {
 
     // rtc.adjust(DateTime()); // set rtc module time
 
+    strcpy(text_n_functions[0], "All Ukraine");
+    strcpy(text_n_functions[1], "On-Duty");
+    strcpy(text_n_functions[2], "Children!");
+    strcpy(text_n_functions[3], "Evacuation");
+    strcpy(text_n_functions[4], "To Depot");
+    strcpy(text_n_functions[5], "# Fill");
+    strcpy(text_n_functions[6], "# Clear");
 }
 
 void loop() {
@@ -159,11 +176,13 @@ void loop() {
             switch(state) {
                 case 1: // enter line settings
                     state = 100;
+                    line_index = 0;
                     updateMenu(true);
                     break;
-                case 2:
-                    // state = ;
-                    // updateMenu(true);
+                case 2: // enter 'text & functions' setting
+                    state = 200;
+                    currect_text_n_function_index = 0;
+                    updateMenu(true);
                     break;
                 case 3:
                     // state = ;
@@ -187,12 +206,26 @@ void loop() {
         if(select_btn.click()) {
             current_sign_text = "Line " + String(lines[line_index]);
             state = 0;
+            currect_text_n_function_index = 255;
             updateMenu(true);
         } else if(up_btn.click()) {
             line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
             updateMenu();
         } else if(down_btn.click()) {
             line_index - 1 <= 0 ? line_index = sizeof(lines) / sizeof(lines[0]) - 1 : line_index--;
+            updateMenu();
+        }
+    } else if(state == 200) { // when setting 'Text & functions'
+        if(select_btn.click()) {
+            current_sign_text = text_n_functions[currect_text_n_function_index];
+            state = 0;
+            line_index = 255;
+            updateMenu(true);
+        } else if(up_btn.click() || left_btn.click()) {
+            currect_text_n_function_index < number_of_other_texts - 1 ? currect_text_n_function_index++ : currect_text_n_function_index = 0;
+            updateMenu();
+        } else if(down_btn.click()  || right_btn.click()) {
+            currect_text_n_function_index > 0 ? currect_text_n_function_index-- : currect_text_n_function_index = number_of_other_texts - 1;
             updateMenu();
         }
     } else if(state = 99) { // when setting time
