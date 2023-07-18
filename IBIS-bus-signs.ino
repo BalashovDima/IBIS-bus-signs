@@ -171,7 +171,7 @@ void loop() {
     if(state == 0 && select_btn.click()) {
         state = 1; // enters menu
         updateMenu(true);
-    } else if(state <= 4) { // when in main menu
+    } else if(state > 0 && state <= 4) { // when in main menu
         if(select_btn.click()) {
             switch(state) {
                 case 1: // enter line settings
@@ -228,7 +228,7 @@ void loop() {
             currect_text_n_function_index > 0 ? currect_text_n_function_index-- : currect_text_n_function_index = number_of_other_texts - 1;
             updateMenu();
         }
-    } else if(state = 99) { // when setting time
+    } else if(state == 99) { // when setting time
         // 01234567
         // DD/MM/YY
         // hh:mm:ss
