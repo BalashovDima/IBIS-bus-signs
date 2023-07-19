@@ -72,6 +72,9 @@ uint8_t currect_InteriorSign_text_index = 0;
 #define number_of_interiorSign_texts 3
 char interiorSign_text[number_of_other_texts][50];
 
+bool updateIBIS = true;
+uint32_t IBIS_timer = 0;
+
 void updateMenu(bool state_changed = false) {
     if(state_changed) {
         lcd.noBlink();
@@ -220,6 +223,8 @@ void setup() {
     } else {
         current_sign_text = text_n_functions[currect_text_n_function_index];
     }
+
+    IBIS_init();
 }
 
 void loop() {
@@ -678,4 +683,17 @@ void loop() {
         updateMenu();
     }
 
+    if(millis() - IBIS_timer >= 10000) updateIBIS = true;
+
+    if(updateIBIS) {
+        String num;
+        if(lines[line_index] > 0) {
+            num = String(lines[line_index]);
+        } else {
+            num = String(abs(lines[line_index]));
+        }
+        IBIS_symbol(num);
+        updateIBIS = false;
+        IBIS_timer = millis();
+    }
 }
