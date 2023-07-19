@@ -101,6 +101,13 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,1);
             lcd.print("> Time settings");
             break;
+        case 10:
+            lcd.setCursor(0,0);
+            lcd.print("Cycle ");
+            lcd.print(cycle_number);
+            lcd.setCursor(0,1);
+            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
+            break;
         case 100:
             lcd.setCursor(0,0);
             lcd.print("Line");
@@ -212,9 +219,15 @@ void loop() {
 
     DateTime now = rtc.now();
 
-    if(state == 0 && SELECT) {
-        state = 1; // enters menu
-        updateMenu(true);
+    if(state == 0 || state == 10) {
+        if(SELECT) {
+            state = 1; // enters menu
+            updateMenu(true);
+        } else if(RIGHT || DOWN || LEFT || UP) {
+            if(state == 0) state = 10;
+            else state = 0;
+            updateMenu(true);
+        } 
     } else if(state > 0 && state <= 4) { // when in main menu
         if(SELECT) {
             switch(state) {
