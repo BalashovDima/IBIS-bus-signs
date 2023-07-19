@@ -36,8 +36,15 @@ EncButton<EB_TICK, VIRT_BTN> right_btn;
 // 2 -- main menu | 'Line' option 1st row . pointed at 'Other text' 2nd row
 // 3 -- main menu | pointed at 'Interior sign' option 1st row. 'Time settings' 2nd row
 // 4 -- main menu | 'Interior sign' option 1st row. pointed at 'Time settings' 2nd row
+// 10 -- home(2) || cycle and text of interior sign are shown
 // 100 -- line setting | Line <number>. Number of line can be change with up and down buttons 
 // 99 -- time setting | DD/MM/YY on 1st row. hh:mm:ss 2nd row. LEFT, RIGHT to go to previous, next number to change. UP, DOWN to increase, decrease
+// 200 -- text or functions setting || text_n_functions is show and can be changed by either of the buttons, SELECT saves the choise. The choise is shown instead of 'Line #'
+// 300 -- interior sign submenu || menu of interior sign, pointed at 'Cycle' 1st row, 'Text'  2nd row
+// 301 -- interior sign submenu || menu of interior sign, 'Cycle' 1st row, pointed at 'Text'  2nd row
+// 302 -- interior sign submenu || menu of interior sign, pointed at 'Turn off'  1nd row, 2nd row is empty
+// 310 -- cycle setting || 'Cycle' and cycle_number. cycle_number can be change by user clicking either of the buttons, SELECT saves the choise
+// 320 -- interior sign text setting || currect_InteriorSign_text_index is show and can be change by either of the buttons, SELECT saves the choise
 
 uint16_t state = 0;
 String date_and_time;
