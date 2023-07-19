@@ -1,7 +1,25 @@
 void IBIS_init() {
-    // Serial.begin(1200, SERIAL_7E2);
-    Serial.begin(115200);
+    Serial.begin(1200, SERIAL_7E2);
+    // Serial.begin(115200);
     while (!Serial);
+}
+
+String three_digit_str(uint16_t num) {
+    if(num < 10) {
+        return "00" + String(num);
+    } else if(num < 100) {
+        return "0" + String(num);
+    } else {
+        return String(num);
+    }
+}
+
+void IBIS_l(uint16_t num) {
+    IBIS_sendTelegram("l"+three_digit_str(num));
+}
+
+void IBIS_z(uint16_t num) {
+    IBIS_sendTelegram("z"+three_digit_str(num));
 }
 
 // copied from https://github.com/open-itcs/onboard-panel-arduino

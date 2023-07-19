@@ -61,11 +61,14 @@ uint8_t setting_time_col = 0;
 // hh:mm:ss
 
 int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
+int8_t destinations[] = {1, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 101, 101, 103, 104, 105, 108, 116};
 uint8_t line_index = 0; // 254 when other text is displayed, otherwise the index of the line in the 'lines' array
 
 #define number_of_other_texts 7
 char text_n_functions[number_of_other_texts][16];
 uint8_t currect_text_n_function_index = 254; // 254 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
+uint16_t l__text_n_functions[number_of_other_texts] = {989, 987, 986, 985, 0, 993, 0};
+uint16_t z__text_n_functions[number_of_other_texts] = {999, 998, 997, 994, 993, 996, 0};
 
 uint8_t cycle_number = 1;
 uint8_t currect_InteriorSign_text_index = 0;
@@ -290,6 +293,7 @@ void loop() {
             EEPROM.update(0, line_index); // save what line_index was chosen
             EEPROM.update(1, 254); // currect_text_n_function_index = 254, meaning that line is displayed
             updateMenu(true);
+            updateIBIS = true;
         } else if(UP) {
             line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
             updateMenu();
@@ -305,6 +309,7 @@ void loop() {
             EEPROM.update(0, 254); // line_index = 254, meaning that text or function is displayed
             EEPROM.update(1, currect_text_n_function_index); // save what text or function was chosen
             updateMenu(true);
+            updateIBIS = true;
         } else if(UP || LEFT) {
             currect_text_n_function_index < number_of_other_texts - 1 ? currect_text_n_function_index++ : currect_text_n_function_index = 0;
             updateMenu();
@@ -685,14 +690,24 @@ void loop() {
 
     if(millis() - IBIS_timer >= 10000) updateIBIS = true;
 
-    if(updateIBIS) {
-        String num;
-        if(lines[line_index] > 0) {
-            num = String(lines[line_index]);
+    if((state == 0 || state == 10) && updateIBIS) {
+        uint16_t l_index;
+        uint16_t z_index;
+        if(line_index != 254) {
+            if(lines[line_index] > 0) {
+                l_index = lines[line_index];
+                z_index = destinations[line_index];
+            } else {
+                l_index = abs(lines[line_index]);
+                z_index = destinations[line_index];
+            }
         } else {
-            num = String(abs(lines[line_index]));
+            l_index = l__text_n_functions[currect_text_n_function_index];
+            z_index = z__text_n_functions[currect_text_n_function_index];
         }
-        IBIS_symbol(num);
+
+        IBIS_l(l_index);
+        IBIS_z(z_index);
         updateIBIS = false;
         IBIS_timer = millis();
     }
