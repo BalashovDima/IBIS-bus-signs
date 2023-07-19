@@ -59,6 +59,11 @@ uint8_t line_index = 0; // 255 when other text is displayed, otherwise the index
 char text_n_functions[number_of_other_texts][16];
 uint8_t currect_text_n_function_index = 255; // 255 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
 
+uint8_t cycle_number = 1;
+uint8_t currect_InteriorSign_text_index = 0;
+#define number_of_interiorSign_texts 3
+char interiorSign_text[number_of_other_texts][50];
+
 void updateMenu(bool state_changed = false) {
     if(state_changed) {
         lcd.noBlink();
@@ -106,6 +111,33 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,1);
             lcd.print("use UP&DOWN");
             break;
+        case 300:
+            lcd.setCursor(0,0);
+            lcd.print("> Cycle");
+            lcd.setCursor(0,1);
+            lcd.print("  Text");
+            break;
+        case 301:
+            lcd.setCursor(0,0);
+            lcd.print("  Cycle");
+            lcd.setCursor(0,1);
+            lcd.print("> Text");
+            break;
+        case 302:
+            lcd.setCursor(0,0);
+            lcd.print("> Turn off");
+            break;
+        case 310:
+            lcd.setCursor(0,0);
+            lcd.print("Cycle ");
+            lcd.setCursor(6,0);
+            lcd.print(cycle_number);
+            break;
+        case 320:
+            lcd.clear();
+            lcd.setCursor(0,0);
+            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
+            break;
         case 99:
             lcd.setCursor(0,0);
             char first_row[] = "DD/MM/YY";
@@ -114,6 +146,7 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,1);
             lcd.print(setting_time.toString(second_row));
             lcd.setCursor(setting_time_col, setting_time_row);
+            break;
         default:
             break;
     }
@@ -157,6 +190,11 @@ void setup() {
     strcpy(text_n_functions[4], "To Depot");
     strcpy(text_n_functions[5], "# Fill");
     strcpy(text_n_functions[6], "# Clear");
+
+    strcpy(interiorSign_text[0], "We sell best apples");
+    strcpy(interiorSign_text[1], "Some other ad");
+    strcpy(interiorSign_text[2], "This is bs120 sign");
+
 }
 
 void loop() {
@@ -190,9 +228,9 @@ void loop() {
                     currect_text_n_function_index = 0;
                     updateMenu(true);
                     break;
-                case 3:
-                    // state = ;
-                    // updateMenu(true);
+                case 3: // enter 'Interior sign' settings
+                    state = 300;
+                    updateMenu(true);
                     break;
                 case 4:
                     state = 99;
@@ -234,6 +272,54 @@ void loop() {
             currect_text_n_function_index > 0 ? currect_text_n_function_index-- : currect_text_n_function_index = number_of_other_texts - 1;
             updateMenu();
         }
+    } else if(state >= 300 && state <= 302) { // when in 'Interior sign' settings
+        if(SELECT) {
+            switch(state) {
+                case 300: // enter in 'cycle' setting of 'Interior sign'
+                    state = 310;
+                    cycle_number = 1;
+                    updateMenu(true);
+                    break;
+                case 301: // enter in 'text' setting of 'Interior sign'
+                    state = 320;
+                    currect_InteriorSign_text_index = 0;
+                    updateMenu(true);
+                    break;
+                case 302: // turn off interior sign 
+                    cycle_number = 0;
+                    state = 0;
+                    updateMenu(true);
+                    break;
+            }
+        } else if(DOWN || RIGHT) {
+            state == 302 ? state = 300 : state++;
+            updateMenu(true);
+        } else if(UP || LEFT) {
+            state == 300 ? state = 302 : state--;
+            updateMenu(true);
+        } 
+    } else if(state == 310) { // setting 'cycle' parameter of 'Interior sign' setting
+        if(SELECT) {
+            state = 0;
+            updateMenu(true);
+        } else if(UP || RIGHT) {
+            cycle_number == 9 ? cycle_number = 1 : cycle_number++;
+            updateMenu();
+        } else if(DOWN || LEFT) {
+            cycle_number == 1 ? cycle_number = 9 : cycle_number--;
+            updateMenu();
+        } 
+    }  else if(state == 320) { // choosing text setting of 'Interior sign' setting
+        if(SELECT) {
+            state = 0;
+            updateMenu(true);
+        } else if(DOWN || RIGHT) {
+            currect_InteriorSign_text_index == number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index = 0 : currect_InteriorSign_text_index++;
+            updateMenu();
+        } else if(UP || LEFT) {
+            currect_InteriorSign_text_index == 0 ? currect_InteriorSign_text_index = number_of_interiorSign_texts - 1 : currect_InteriorSign_text_index--;
+            updateMenu();
+        } 
     } else if(state == 99) { // when setting time
         // 01234567
         // DD/MM/YY
