@@ -2,6 +2,7 @@
 #include "RTClib.h"
 #include <AnalogKey.h>
 #include <EncButton.h>
+#include <EEPROM.h>
 
 
 #define LCD_columns 16
@@ -48,7 +49,7 @@ EncButton<EB_TICK, VIRT_BTN> right_btn;
 
 uint16_t state = 0;
 String date_and_time;
-String current_sign_text = "Line 1";
+String current_sign_text;
 
 uint8_t second = 0;
 
@@ -60,11 +61,11 @@ uint8_t setting_time_col = 0;
 // hh:mm:ss
 
 int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
-uint8_t line_index = 0; // 255 when other text is displayed, otherwise the index of the line in the 'lines' array
+uint8_t line_index = 0; // 254 when other text is displayed, otherwise the index of the line in the 'lines' array
 
 #define number_of_other_texts 7
 char text_n_functions[number_of_other_texts][16];
-uint8_t currect_text_n_function_index = 255; // 255 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
+uint8_t currect_text_n_function_index = 254; // 254 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
 
 uint8_t cycle_number = 1;
 uint8_t currect_InteriorSign_text_index = 0;
@@ -209,6 +210,16 @@ void setup() {
     strcpy(interiorSign_text[1], "Some other ad");
     strcpy(interiorSign_text[2], "This is bs120 sign");
 
+    if(EEPROM.read(0) != 255) line_index = EEPROM.read(0);
+    if(EEPROM.read(1) != 255) currect_text_n_function_index = EEPROM.read(1);
+    if(EEPROM.read(2) != 255) cycle_number = EEPROM.read(2);
+    if(EEPROM.read(3) != 255) currect_InteriorSign_text_index = EEPROM.read(3);
+
+    if(line_index != 254) {
+        current_sign_text = "Line "+ String(lines[line_index]);
+    } else {
+        current_sign_text = text_n_functions[currect_text_n_function_index];
+    }
 }
 
 void loop() {
@@ -270,7 +281,9 @@ void loop() {
         if(SELECT) {
             current_sign_text = "Line " + String(lines[line_index]);
             state = 0;
-            currect_text_n_function_index = 255;
+            currect_text_n_function_index = 254;
+            EEPROM.update(0, line_index); // save what line_index was chosen
+            EEPROM.update(1, 254); // currect_text_n_function_index = 254, meaning that line is displayed
             updateMenu(true);
         } else if(UP) {
             line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
@@ -283,7 +296,9 @@ void loop() {
         if(SELECT) {
             current_sign_text = text_n_functions[currect_text_n_function_index];
             state = 0;
-            line_index = 255;
+            line_index = 254;
+            EEPROM.update(0, 254); // line_index = 254, meaning that text or function is displayed
+            EEPROM.update(1, currect_text_n_function_index); // save what text or function was chosen
             updateMenu(true);
         } else if(UP || LEFT) {
             currect_text_n_function_index < number_of_other_texts - 1 ? currect_text_n_function_index++ : currect_text_n_function_index = 0;
@@ -321,6 +336,7 @@ void loop() {
     } else if(state == 310) { // setting 'cycle' parameter of 'Interior sign' setting
         if(SELECT) {
             state = 0;
+            EEPROM.update(2, cycle_number); // save what cycle was chosen
             updateMenu(true);
         } else if(UP || RIGHT) {
             cycle_number == 9 ? cycle_number = 1 : cycle_number++;
@@ -332,6 +348,7 @@ void loop() {
     }  else if(state == 320) { // choosing text setting of 'Interior sign' setting
         if(SELECT) {
             state = 0;
+            EEPROM.update(3, currect_InteriorSign_text_index);
             updateMenu(true);
         } else if(DOWN || RIGHT) {
             currect_InteriorSign_text_index == number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index = 0 : currect_InteriorSign_text_index++;
