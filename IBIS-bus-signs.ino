@@ -54,6 +54,7 @@ String date_and_time;
 String current_sign_text;
 
 uint8_t second = 0;
+uint8_t minute = 0;
 
 DateTime setting_time;
 uint8_t setting_time_row = 1;
@@ -77,7 +78,7 @@ uint16_t z__text_n_functions[number_of_other_texts] = {999, 998, 997, 994, 993, 
 uint8_t cycle_number = 1;
 uint8_t currect_InteriorSign_text_index = 0;
 #define number_of_interiorSign_texts 3
-char interiorSign_text[number_of_other_texts][50];
+char interiorSign_text[number_of_interiorSign_texts][65];
 
 bool updateIBIS = true;
 uint32_t IBIS_timer = 0;
@@ -120,11 +121,12 @@ void updateMenu(bool state_changed = false) {
             lcd.print("> Time settings");
             break;
         case 10:
+            lcd.setCursor(0,1);
+            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
             lcd.setCursor(0,0);
             lcd.print("Cycle ");
             lcd.print(cycle_number);
-            lcd.setCursor(0,1);
-            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
+            lcd.print(" ");
             break;
         case 100:
             lcd.setCursor(0,0);
@@ -216,9 +218,9 @@ void setup() {
     strcpy(text_n_functions[5], "# Fill");
     strcpy(text_n_functions[6], "# Clear");
 
-    strcpy(interiorSign_text[0], "We sell best apples");
-    strcpy(interiorSign_text[1], "Some other ad");
-    strcpy(interiorSign_text[2], "This is bs120 sign");
+    strcpy(interiorSign_text[0], "Druga reklama (textova)");
+    strcpy(interiorSign_text[1], "Proda~mo sma}n{ %bluki. Zamovl%jte po telefonu 972825314");
+    strcpy(interiorSign_text[2], "Dobrogo ve}ora, mi z Ukrawni!");
 
     if(EEPROM.read(4) != 255) line_or_text = EEPROM.read(4);
     if(EEPROM.read(0) != 255) line_index = EEPROM.read(0);
@@ -233,6 +235,9 @@ void setup() {
     }
 
     IBIS_init();
+    delay(500);
+
+    IBIS_xC(cycle_number);
 }
 
 void loop() {
@@ -339,16 +344,15 @@ void loop() {
             switch(state) {
                 case 300: // enter in 'cycle' setting of 'Interior sign'
                     state = 310;
-                    cycle_number = 1;
                     updateMenu(true);
                     break;
                 case 301: // enter in 'text' setting of 'Interior sign'
                     state = 320;
-                    currect_InteriorSign_text_index = 0;
                     updateMenu(true);
                     break;
                 case 302: // turn off interior sign 
                     cycle_number = 0;
+                    IBIS_xC(cycle_number);
                     state = 0;
                     updateMenu(true);
                     break;
@@ -362,6 +366,7 @@ void loop() {
         } 
     } else if(state == 310) { // setting 'cycle' parameter of 'Interior sign' setting
         if(SELECT) {
+            IBIS_xC(cycle_number);
             state = 0;
             EEPROM.update(2, cycle_number); // save what cycle was chosen
             updateMenu(true);
@@ -376,6 +381,7 @@ void loop() {
         if(SELECT) {
             state = 0;
             EEPROM.update(3, currect_InteriorSign_text_index);
+            updateIBIS = true;
             updateMenu(true);
         } else if(DOWN || RIGHT) {
             currect_InteriorSign_text_index == number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index = 0 : currect_InteriorSign_text_index++;
@@ -392,6 +398,7 @@ void loop() {
             if(setting_time.isValid()) {
                 state = 0;
                 rtc.adjust(setting_time);
+                updateIBIS = true;
                 updateMenu(true);
             } else {
                 lcd.setCursor(0,0);
@@ -717,9 +724,12 @@ void loop() {
         updateMenu();
     }
 
-    if(millis() - IBIS_timer >= 10000) updateIBIS = true;
+    if(minute != now.minute()) {
+        minute = now.minute();
+        updateIBIS = true;
+    }
 
-    if((state == 0 || state == 10) && updateIBIS) {
+    if(updateIBIS) {
         uint16_t l_index;
         uint16_t z_index;
         if(line_or_text == 1) {
@@ -735,8 +745,16 @@ void loop() {
             z_index = z__text_n_functions[currect_text_n_function_index];
         }
 
+        char hhmm[] = "hhmm";
+        now.toString(hhmm);
+        char ddmmyyyy[] = "DD.MM.YYYY";
+        now.toString(ddmmyyyy);
+
         IBIS_l(l_index);
         IBIS_z(z_index);
+        IBIS_u(hhmm);
+        IBIS_v(ddmmyyyy);
+        IBIS_zM(interiorSign_text[currect_InteriorSign_text_index]);
         updateIBIS = false;
         IBIS_timer = millis();
     }
