@@ -9,19 +9,19 @@
 #define LCD_rows 2
 // initialize the library by associating any needed LCD interface pin
 // with the arduino pin number it is connected to
-#define rs 8
-#define en 9
-#define d4 4 
-#define d5 5
-#define d6 6
-#define d7 7
+#define rs 12
+#define en 11
+#define d4 5 
+#define d5 4
+#define d6 3
+#define d7 2
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 RTC_DS1307 rtc;
 
 char daysOfTheWeek[7][12] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
 
-int16_t sigs[5] = {640, 411, 257, 100, 0}; // array of signal value of buttons
+int16_t sigs[5] = {732, 496, 314, 138, 0}; // array of signal value of buttons
 AnalogKey<A0, 5, sigs> keys; // pin of button, number of buttons, array of signal
 
 EncButton<EB_TICK, VIRT_BTN> select_btn;
@@ -231,11 +231,11 @@ void setup() {
 }
 
 void loop() {
-    select_btn.tick(keys.status(0));
-    left_btn.tick(keys.status(1));
-    down_btn.tick(keys.status(2));
-    up_btn.tick(keys.status(3));
-    right_btn.tick(keys.status(4));
+    select_btn.tick(keys.status(2));
+    left_btn.tick(keys.status(4));
+    down_btn.tick(keys.status(0));
+    up_btn.tick(keys.status(1));
+    right_btn.tick(keys.status(3));
 
     bool SELECT = select_btn.click() || select_btn.step();
     bool LEFT = left_btn.click() || left_btn.step();
