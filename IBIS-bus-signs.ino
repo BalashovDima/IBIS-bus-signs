@@ -62,11 +62,13 @@ uint8_t setting_time_col = 0;
 
 int8_t lines[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, -1, -2, -3, -4, -5, -8, -16};
 int8_t destinations[] = {1, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 101, 101, 103, 104, 105, 108, 116};
-uint8_t line_index = 0; // 254 when other text is displayed, otherwise the index of the line in the 'lines' array
+uint8_t line_index = 0; // the index of the line in the 'lines' array
+
+byte line_or_text = 1; // '1' for line, '2' for text
 
 #define number_of_other_texts 7
 char text_n_functions[number_of_other_texts][16];
-uint8_t currect_text_n_function_index = 254; // 254 when line number is displayed, otherwise the index of the text in the 'text_n_functions' array 
+uint8_t currect_text_n_function_index = 0; // the index of the text in the 'text_n_functions' array 
 uint16_t l__text_n_functions[number_of_other_texts] = {989, 987, 986, 985, 0, 993, 0};
 uint16_t z__text_n_functions[number_of_other_texts] = {999, 998, 997, 994, 993, 996, 0};
 
@@ -216,12 +218,13 @@ void setup() {
     strcpy(interiorSign_text[1], "Some other ad");
     strcpy(interiorSign_text[2], "This is bs120 sign");
 
+    if(EEPROM.read(4) != 255) line_or_text = EEPROM.read(4);
     if(EEPROM.read(0) != 255) line_index = EEPROM.read(0);
     if(EEPROM.read(1) != 255) currect_text_n_function_index = EEPROM.read(1);
     if(EEPROM.read(2) != 255) cycle_number = EEPROM.read(2);
     if(EEPROM.read(3) != 255) currect_InteriorSign_text_index = EEPROM.read(3);
 
-    if(line_index != 254) {
+    if(line_or_text == 1) {
         current_sign_text = "Line "+ String(lines[line_index]);
     } else {
         current_sign_text = text_n_functions[currect_text_n_function_index];
@@ -259,12 +262,10 @@ void loop() {
             switch(state) {
                 case 1: // enter line settings
                     state = 100;
-                    line_index = 0;
                     updateMenu(true);
                     break;
                 case 2: // enter 'text & functions' setting
                     state = 200;
-                    currect_text_n_function_index = 0;
                     updateMenu(true);
                     break;
                 case 3: // enter 'Interior sign' settings
@@ -289,9 +290,9 @@ void loop() {
         if(SELECT) {
             current_sign_text = "Line " + String(lines[line_index]);
             state = 0;
-            currect_text_n_function_index = 254;
+            line_or_text = 1; // remember that line is displayed
+            EEPROM.update(4, 1); // remember that line is displayed
             EEPROM.update(0, line_index); // save what line_index was chosen
-            EEPROM.update(1, 254); // currect_text_n_function_index = 254, meaning that line is displayed
             updateMenu(true);
             updateIBIS = true;
         } else if(UP) {
@@ -305,8 +306,8 @@ void loop() {
         if(SELECT) {
             current_sign_text = text_n_functions[currect_text_n_function_index];
             state = 0;
-            line_index = 254;
-            EEPROM.update(0, 254); // line_index = 254, meaning that text or function is displayed
+            line_or_text = 2; // save that text or function is displayed
+            EEPROM.update(4, 2); // remember that text or function is displayed
             EEPROM.update(1, currect_text_n_function_index); // save what text or function was chosen
             updateMenu(true);
             updateIBIS = true;
@@ -693,7 +694,7 @@ void loop() {
     if((state == 0 || state == 10) && updateIBIS) {
         uint16_t l_index;
         uint16_t z_index;
-        if(line_index != 254) {
+        if(line_or_text == 1) {
             if(lines[line_index] > 0) {
                 l_index = lines[line_index];
                 z_index = destinations[line_index];
