@@ -77,8 +77,9 @@ uint16_t z__text_n_functions[number_of_other_texts] = {999, 998, 997, 994, 993, 
 
 uint8_t cycle_number = 1;
 uint8_t currect_InteriorSign_text_index = 0;
+// 'number_of_interiorSign_texts' is changed automatically when running the python program that sets text and value
+// marker of number_of_interiorSign_texts
 #define number_of_interiorSign_texts 3
-char interiorSign_text[number_of_interiorSign_texts][65];
 
 bool updateIBIS = true;
 uint32_t IBIS_timer = 0;
@@ -122,7 +123,21 @@ void updateMenu(bool state_changed = false) {
             break;
         case 10:
             lcd.setCursor(0,1);
-            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
+            // start | zM text info on LCD
+			if(currect_InteriorSign_text_index == 0) {
+				// length: 9
+				// Реклама 1
+				lcd.print("Reklama 1");
+			} else if(currect_InteriorSign_text_index == 1) {
+				// length: 9
+				// Реклама 2
+				lcd.print("Reklama 2");
+			} else if(currect_InteriorSign_text_index == 2) {
+				// length: 13
+				// Реклама яблук
+				lcd.print("Reklama iabluk");
+			}
+            // end | zM text info on LCD
             lcd.setCursor(0,0);
             lcd.print("Cycle ");
             lcd.print(cycle_number);
@@ -163,7 +178,21 @@ void updateMenu(bool state_changed = false) {
         case 320:
             lcd.clear();
             lcd.setCursor(0,0);
-            lcd.print(interiorSign_text[currect_InteriorSign_text_index]);
+            // start | zM text info on LCD
+			if(currect_InteriorSign_text_index == 0) {
+				// length: 9
+				// Реклама 1
+				lcd.print("Reklama 1");
+			} else if(currect_InteriorSign_text_index == 1) {
+				// length: 9
+				// Реклама 2
+				lcd.print("Reklama 2");
+			} else if(currect_InteriorSign_text_index == 2) {
+				// length: 13
+				// Реклама яблук
+				lcd.print("Reklama iabluk");
+			}
+            // end | zM text info on LCD
             break;
         case 99:
             lcd.setCursor(0,0);
@@ -218,9 +247,6 @@ void setup() {
     strcpy(text_n_functions[5], "# Fill");
     strcpy(text_n_functions[6], "# Clear");
 
-    strcpy(interiorSign_text[0], "Druga reklama (textova)");
-    strcpy(interiorSign_text[1], "Proda~mo sma}n{ %bluki. Zamovl%jte po telefonu 972825314");
-    strcpy(interiorSign_text[2], "Dobrogo ve}ora, mi z Ukrawni!");
 
     if(EEPROM.read(4) != 255) line_or_text = EEPROM.read(4);
     if(EEPROM.read(0) != 255) line_index = EEPROM.read(0);
@@ -754,7 +780,23 @@ void loop() {
         IBIS_z(z_index);
         IBIS_u(hhmm);
         IBIS_v(ddmmyyyy);
-        IBIS_zM(interiorSign_text[currect_InteriorSign_text_index]);
+
+        // start of the zM command sending
+		if(currect_InteriorSign_text_index == 0) {
+			// length: 13
+			// Перша реклама
+			IBIS_zM("Per\\a reklama");
+		} else if(currect_InteriorSign_text_index == 1) {
+			// length: 24
+			// Друга реклама (текстова)
+			IBIS_zM("Druga reklama (tekstova)");
+		} else if(currect_InteriorSign_text_index == 2) {
+			// length: 53
+			// Продаємо яблуки. Замовляйте по телефону 097 123 56 37
+			IBIS_zM("Proda~mo %bluki. Zamovl%jte po telefonu 097 123 56 37");
+		}
+        // end of the zM command sending
+
         updateIBIS = false;
         IBIS_timer = millis();
     }

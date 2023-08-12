@@ -93,10 +93,21 @@ String IBIS_wrapTelegram(String telegram) {
     return telegram;
 }
 
+uint8_t calculateParity(String telegram) {
+    telegram += '\x0d';
+    unsigned char checksum = 0x7F;
+    for (int i = 0; i < telegram.length(); i++) {
+        checksum ^= (unsigned char)telegram[i];
+    }
+    return checksum;
+}
+
 void IBIS_sendTelegram(String telegram) {
-    IBIS_processSpecialCharacters(&telegram);
-    telegram = IBIS_wrapTelegram(telegram);
+    // IBIS_processSpecialCharacters(&telegram);
+    // telegram = IBIS_wrapTelegram(telegram);
     Serial.print(telegram);
+    Serial.write(0x0d);
+    Serial.write(calculateParity(telegram));
 }
 
 void IBIS_DS021t(String address, String text) {
