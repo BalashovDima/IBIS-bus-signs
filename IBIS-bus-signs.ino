@@ -30,8 +30,6 @@ EncButton<EB_TICK, VIRT_BTN> down_btn;
 EncButton<EB_TICK, VIRT_BTN> up_btn;
 EncButton<EB_TICK, VIRT_BTN> right_btn;
 
-uint32_t select_or_back_timer = 0;
-
 // each state marks certain 'state'. for each state (each number) the text of the menu is different 
 // the codes are as follows:
 // 0 -- home | stand-by mode. not in menu. date, time and line are shown
@@ -247,21 +245,7 @@ void loop() {
     up_btn.tick(keys.status(1));
     right_btn.tick(keys.status(3));
 
-    bool BACK = false;
-    bool SELECT = false;
-    if(select_or_back_timer == 0) {
-        if(select_btn.click()) {
-            select_or_back_timer = millis();
-        }
-    } else {
-        if(select_btn.click()) {
-            BACK = true;
-            select_or_back_timer = 0;
-        } else if(millis() - select_or_back_timer >= 600 && select_or_back_timer > 0) {
-            SELECT = true;
-            select_or_back_timer = 0;
-        } 
-    }
+    bool SELECT = select_btn.click() || select_btn.step();
     bool LEFT = left_btn.click() || left_btn.step();
     bool DOWN = down_btn.click() || down_btn.step();
     bool UP = up_btn.click() || up_btn.step();
@@ -704,18 +688,6 @@ void loop() {
         }
     }
 
-    if(BACK) {
-        if(state > 0 && state < 5) {
-            state = 0;
-            updateMenu(true);
-        } else if(state == 100 || state == 99 || state == 200 || state == 300 || state == 301 || state == 302) {
-            state = 1;
-            updateMenu(true);
-        } else if(state == 310 || state == 320) {
-            state = 300;
-            updateMenu(true);
-        }
-    }
 
     if(state == 0 && second != now.second()) {
         char date_time[] = "DD/MM  hh:mm:ss";
