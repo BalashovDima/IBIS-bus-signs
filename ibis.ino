@@ -22,6 +22,22 @@ void IBIS_z(uint16_t num) {
     IBIS_sendTelegram("z"+three_digit_str(num));
 }
 
+void IBIS_xC(byte cycleNum) {
+    IBIS_sendTelegram("xC"+String(cycleNum));
+}
+
+void IBIS_u(String hhmm) {
+    IBIS_sendTelegram("u"+hhmm);
+}
+
+void IBIS_v(String text) {
+    IBIS_sendTelegram("v"+text);
+}
+
+void IBIS_zM(String text) {
+    IBIS_sendTelegram("zM "+text);
+}
+
 // copied from https://github.com/open-itcs/onboard-panel-arduino
 char * createtelegram(char vals[]) {
     char result[8 + strlen(vals)];
