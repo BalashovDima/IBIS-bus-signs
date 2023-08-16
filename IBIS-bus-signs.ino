@@ -232,12 +232,16 @@ void lcd_pointer(bool first_row = true) {
 void setup() {
     lcd.begin(LCD_columns, LCD_rows); // set up the LCD's number of columns and rows
 
-    if (!rtc.begin()) {
+    if(!rtc.begin()) {
         // code to do if failed to connect to rtc module
         // Serial.println("Couldn't find RTC");
     }
 
-    // rtc.adjust(DateTime()); // set rtc module time
+    if(!rtc.isrunning()) {
+        // set default time
+        // time needs to be set after battery change or when rtc is used for the first time
+        rtc.adjust(DateTime(2023, 1, 1, 12, 1, 1));
+    }
 
     strcpy(text_n_functions[0], "All Ukraine");
     strcpy(text_n_functions[1], "On-Duty");
