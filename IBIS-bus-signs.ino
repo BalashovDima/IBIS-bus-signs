@@ -99,27 +99,27 @@ void updateMenu(bool state_changed = false) {
             break;
         case 1:
             lcd.setCursor(0,0);
-            lcd.print("> Line");
+            lcd.print(F("> Line"));
             lcd.setCursor(0,1);
-            lcd.print("  Text|functions");
+            lcd.print(F("  Text|functions"));
             break;
         case 2:
             lcd.setCursor(0,0);
-            lcd.print("  Line");
+            lcd.print(F("  Line"));
             lcd.setCursor(0,1);
-            lcd.print("> Text|functions");
+            lcd.print(F("> Text|functions"));
             break;
         case 3:
             lcd.setCursor(0,0);
-            lcd.print("> Interior sign");
+            lcd.print(F("> Interior sign"));
             lcd.setCursor(0,1);
-            lcd.print("  Time settings");
+            lcd.print(F("  Time settings"));
             break;
         case 4:
             lcd.setCursor(0,0);
-            lcd.print("  Interior sign");
+            lcd.print(F("  Interior sign"));
             lcd.setCursor(0,1);
-            lcd.print("> Time settings");
+            lcd.print(F("> Time settings"));
             break;
         case 10:
             lcd.setCursor(0,1);
@@ -127,51 +127,49 @@ void updateMenu(bool state_changed = false) {
 			if(currect_InteriorSign_text_index == 0) {
 				// length: 9
 				// Реклама 1
-				lcd.print("Reklama 1");
+				lcd.print(F("Reklama 1"));
 			} else if(currect_InteriorSign_text_index == 1) {
 				// length: 9
 				// Реклама 2
-				lcd.print("Reklama 2");
+				lcd.print(F("Reklama 2"));
 			} else if(currect_InteriorSign_text_index == 2) {
 				// length: 13
 				// Реклама яблук
-				lcd.print("Reklama iabluk");
+				lcd.print(F("Reklama iabluk"));
 			}
             // end | zM text info on LCD
             lcd.setCursor(0,0);
-            lcd.print("Cycle ");
+            lcd.print(F("Cycle "));
             lcd.print(cycle_number);
             lcd.print(" ");
             break;
         case 100:
             lcd.setCursor(0,0);
-            lcd.print("Line");
+            lcd.print(F("Line"));
             lcd.setCursor(5,0);
-            lcd.print("    ");
+            lcd.print(F("    "));
             lcd.setCursor(5,0);
             lcd.print(lines[line_index]);
-            lcd.setCursor(0,1);
-            lcd.print("use UP&DOWN");
             break;
         case 300:
             lcd.setCursor(0,0);
-            lcd.print("> Cycle");
+            lcd.print(F("> Cycle"));
             lcd.setCursor(0,1);
-            lcd.print("  Text");
+            lcd.print(F("  Text"));
             break;
         case 301:
             lcd.setCursor(0,0);
-            lcd.print("  Cycle");
+            lcd.print(F("  Cycle"));
             lcd.setCursor(0,1);
-            lcd.print("> Text");
+            lcd.print(F("> Text"));
             break;
         case 302:
             lcd.setCursor(0,0);
-            lcd.print("> Turn off");
+            lcd.print(F("> Turn off"));
             break;
         case 310:
             lcd.setCursor(0,0);
-            lcd.print("Cycle ");
+            lcd.print(F("Cycle "));
             lcd.setCursor(6,0);
             lcd.print(cycle_number);
             break;
@@ -182,15 +180,15 @@ void updateMenu(bool state_changed = false) {
 			if(currect_InteriorSign_text_index == 0) {
 				// length: 9
 				// Реклама 1
-				lcd.print("Reklama 1");
+				lcd.print(F("Reklama 1"));
 			} else if(currect_InteriorSign_text_index == 1) {
 				// length: 9
 				// Реклама 2
-				lcd.print("Reklama 2");
+				lcd.print(F("Reklama 2"));
 			} else if(currect_InteriorSign_text_index == 2) {
 				// length: 13
 				// Реклама яблук
-				lcd.print("Reklama iabluk");
+				lcd.print(F("Reklama iabluk"));
 			}
             // end | zM text info on LCD
             break;
@@ -432,9 +430,9 @@ void loop() {
                 updateMenu(true);
             } else {
                 lcd.setCursor(0,0);
-                lcd.print("Invalid ");
+                lcd.print(F("Invalid "));
                 lcd.setCursor(0,1);
-                lcd.print("Date    ");
+                lcd.print(F("Date    "));
             }
         } else if(UP) {
             if(setting_time_row == 0) { // 'date' row
@@ -789,15 +787,15 @@ void loop() {
 		if(currect_InteriorSign_text_index == 0) {
 			// length: 13
 			// Перша реклама
-			IBIS_zM("Per\\a reklama");
+			IBIS_zM(F("Per\\a reklama"));
 		} else if(currect_InteriorSign_text_index == 1) {
 			// length: 24
 			// Друга реклама (текстова)
-			IBIS_zM("Druga reklama (tekstova)");
+			IBIS_zM(F("Druga reklama (tekstova)"));
 		} else if(currect_InteriorSign_text_index == 2) {
 			// length: 53
 			// Продаємо яблуки. Замовляйте по телефону 097 123 56 37
-			IBIS_zM("Proda~mo %bluki. Zamovl%jte po telefonu 097 123 56 37");
+			IBIS_zM(F("Proda~mo %bluki. Zamovl%jte po telefonu 097 123 56 37"));
 		}
         // end of the zM command sending
 
