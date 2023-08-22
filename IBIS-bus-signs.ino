@@ -126,6 +126,14 @@ void updateMenu(bool state_changed = false) {
             lcd.print(F("> Time settings"));
             break;
         case 10:
+            if(cycle_number == 0) {
+                lcd.setCursor(0,0);
+                lcd.print(F("Sign is OFF"));
+                lcd.setCursor(0,1);
+                lcd.print(F("Choose a cycle"));
+                break;
+            }
+            
             lcd.setCursor(0,1);
             // start | zM text info on LCD
 			if(currect_InteriorSign_text_index == 0) {
