@@ -84,7 +84,9 @@ uint8_t currect_InteriorSign_text_index = 0;
 bool updateIBIS_lNz = true;
 bool updateIBIS_zM = true;
 bool updateIBIS_dateNtime = true;
-uint32_t IBIS_timer = 0;
+bool loop_interior_sign_texts = false;
+#define INTERIOR_SIGN_TEXT_CHANGE_DELAY 7000
+uint32_t loop_zM_timer = 0;
 
 void updateMenu(bool state_changed = false) {
     if(state_changed) {
@@ -143,7 +145,13 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,0);
             lcd.print(F("Cycle "));
             lcd.print(cycle_number);
-            lcd.print(" ");
+            if(loop_interior_sign_texts) {
+                lcd.setCursor(13,0);
+                lcd.print("ALL");
+            } else {
+                lcd.setCursor(10,0);
+                lcd.print("single");
+            }
             break;
         case 100:
             lcd.setCursor(0,0);
@@ -157,16 +165,34 @@ void updateMenu(bool state_changed = false) {
             lcd.setCursor(0,0);
             lcd.print(F("> Cycle"));
             lcd.setCursor(0,1);
-            lcd.print(F("  Text"));
+            lcd.print(F("  Single text"));
             break;
         case 301:
             lcd.setCursor(0,0);
             lcd.print(F("  Cycle"));
             lcd.setCursor(0,1);
-            lcd.print(F("> Text"));
+            lcd.print(F("> Single text"));
             break;
         case 302:
             lcd.setCursor(0,0);
+            lcd.print(F("> Loop all | "));
+            if(loop_interior_sign_texts) {
+                lcd.print(F("ON"));
+            } else {
+                lcd.print(F("OFF"));
+            }
+            lcd.setCursor(0,1);
+            lcd.print(F("  Turn off"));
+            break;
+        case 303:
+            lcd.setCursor(0,0);
+            lcd.print(F("  Loop all | "));
+            if(loop_interior_sign_texts) {
+                lcd.print(F("ON"));
+            } else {
+                lcd.print(F("OFF"));
+            }
+            lcd.setCursor(0,1);
             lcd.print(F("> Turn off"));
             break;
         case 310:
@@ -257,6 +283,7 @@ void setup() {
     if(EEPROM.read(1) != 255) currect_text_n_function_index = EEPROM.read(1);
     if(EEPROM.read(2) != 255) cycle_number = EEPROM.read(2);
     if(EEPROM.read(3) != 255) currect_InteriorSign_text_index = EEPROM.read(3);
+    if(EEPROM.read(5) != 255) loop_interior_sign_texts = EEPROM.read(5);
 
     if(line_or_text == 1) {
         current_sign_text = "Line "+ String(lines[line_index]);
@@ -369,7 +396,7 @@ void loop() {
             currect_text_n_function_index > 0 ? currect_text_n_function_index-- : currect_text_n_function_index = number_of_other_texts - 1;
             updateMenu();
         }
-    } else if(state >= 300 && state <= 302) { // when in 'Interior sign' settings
+    } else if(state >= 300 && state <= 303) { // when in 'Interior sign' settings
         if(SELECT) {
             switch(state) {
                 case 300: // enter in 'cycle' setting of 'Interior sign'
@@ -380,7 +407,18 @@ void loop() {
                     state = 320;
                     updateMenu(true);
                     break;
-                case 302: // turn off interior sign 
+                case 302:
+                    if(loop_interior_sign_texts) {                
+                        loop_interior_sign_texts = false; // loop through all the texts
+                        EEPROM.update(5, 0); // remember that looping through all the texts
+                    } else {
+                        loop_interior_sign_texts = true; // turn off looping through all the texts
+                        EEPROM.update(5, 1); // remember that looping is off
+                    }
+                    state = 0;
+                    updateMenu(true);
+                    break;
+                case 303: // turn off interior sign 
                     cycle_number = 0;
                     IBIS_xC(cycle_number);
                     state = 0;
@@ -388,10 +426,10 @@ void loop() {
                     break;
             }
         } else if(DOWN || RIGHT) {
-            state == 302 ? state = 300 : state++;
+            state == 303 ? state = 300 : state++;
             updateMenu(true);
         } else if(UP || LEFT) {
-            state == 300 ? state = 302 : state--;
+            state == 300 ? state = 303 : state--;
             updateMenu(true);
         } 
     } else if(state == 310) { // setting 'cycle' parameter of 'Interior sign' setting
@@ -411,6 +449,8 @@ void loop() {
         if(SELECT) {
             state = 0;
             EEPROM.update(3, currect_InteriorSign_text_index);
+            loop_interior_sign_texts = false;
+            EEPROM.update(5, 0);
             updateIBIS_zM = true;
             updateMenu(true);
         } else if(DOWN || RIGHT) {
@@ -738,7 +778,7 @@ void loop() {
         if(state > 0 && state < 5) {
             state = 0;
             updateMenu(true);
-        } else if(state == 100 || state == 99 || state == 200 || state == 300 || state == 301 || state == 302) {
+        } else if(state == 100 || state == 99 || state == 200 || state == 300 || state == 301 || state == 302 || state == 303) {
             state = 1;
             updateMenu(true);
         } else if(state == 310 || state == 320) {
@@ -811,5 +851,16 @@ void loop() {
         // end of the zM command sending
 
         updateIBIS_zM = false;
+    }
+
+    if(loop_interior_sign_texts) {
+        if(millis() - loop_zM_timer >= INTERIOR_SIGN_TEXT_CHANGE_DELAY) {
+            currect_InteriorSign_text_index < number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index++ : currect_InteriorSign_text_index = 0;
+            updateIBIS_zM = true;
+            if(state == 10) {
+                updateMenu(true);
+            }
+            loop_zM_timer = millis();
+        }
     }
 }
