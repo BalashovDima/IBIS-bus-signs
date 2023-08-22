@@ -81,7 +81,9 @@ uint8_t currect_InteriorSign_text_index = 0;
 // marker of number_of_interiorSign_texts
 #define number_of_interiorSign_texts 3
 
-bool updateIBIS = true;
+bool updateIBIS_lNz = true;
+bool updateIBIS_zM = true;
+bool updateIBIS_dateNtime = true;
 uint32_t IBIS_timer = 0;
 
 void updateMenu(bool state_changed = false) {
@@ -343,7 +345,7 @@ void loop() {
             EEPROM.update(4, 1); // remember that line is displayed
             EEPROM.update(0, line_index); // save what line_index was chosen
             updateMenu(true);
-            updateIBIS = true;
+            updateIBIS_lNz = true;
         } else if(UP) {
             line_index + 1 >= sizeof(lines) / sizeof(lines[0]) ? line_index = 0 : line_index++;
             updateMenu();
@@ -359,7 +361,7 @@ void loop() {
             EEPROM.update(4, 2); // remember that text or function is displayed
             EEPROM.update(1, currect_text_n_function_index); // save what text or function was chosen
             updateMenu(true);
-            updateIBIS = true;
+            updateIBIS_lNz = true;
         } else if(UP || LEFT) {
             currect_text_n_function_index < number_of_other_texts - 1 ? currect_text_n_function_index++ : currect_text_n_function_index = 0;
             updateMenu();
@@ -409,7 +411,7 @@ void loop() {
         if(SELECT) {
             state = 0;
             EEPROM.update(3, currect_InteriorSign_text_index);
-            updateIBIS = true;
+            updateIBIS_zM = true;
             updateMenu(true);
         } else if(DOWN || RIGHT) {
             currect_InteriorSign_text_index == number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index = 0 : currect_InteriorSign_text_index++;
@@ -426,7 +428,7 @@ void loop() {
             if(setting_time.isValid()) {
                 state = 0;
                 rtc.adjust(setting_time);
-                updateIBIS = true;
+                updateIBIS_dateNtime = true;
                 updateMenu(true);
             } else {
                 lcd.setCursor(0,0);
@@ -754,10 +756,10 @@ void loop() {
 
     if(minute != now.minute()) {
         minute = now.minute();
-        updateIBIS = true;
+        updateIBIS_dateNtime = true;
     }
 
-    if(updateIBIS) {
+    if(updateIBIS_lNz) {
         uint16_t l_index;
         uint16_t z_index;
         if(line_or_text == 1) {
@@ -773,16 +775,25 @@ void loop() {
             z_index = z__text_n_functions[currect_text_n_function_index];
         }
 
+        IBIS_l(l_index);
+        IBIS_z(z_index);
+
+        updateIBIS_lNz = false;
+    }
+
+    if(updateIBIS_dateNtime) {
         char hhmm[] = "hhmm";
         now.toString(hhmm);
         char ddmmyyyy[] = "DD.MM.YYYY";
         now.toString(ddmmyyyy);
 
-        IBIS_l(l_index);
-        IBIS_z(z_index);
         IBIS_u(hhmm);
         IBIS_v(ddmmyyyy);
 
+        updateIBIS_dateNtime = false;
+    }
+        
+    if(updateIBIS_zM) {
         // start of the zM command sending
 		if(currect_InteriorSign_text_index == 0) {
 			// length: 13
@@ -799,7 +810,6 @@ void loop() {
 		}
         // end of the zM command sending
 
-        updateIBIS = false;
-        IBIS_timer = millis();
+        updateIBIS_zM = false;
     }
 }
