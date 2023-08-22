@@ -136,19 +136,19 @@ void updateMenu(bool state_changed = false) {
             
             lcd.setCursor(0,1);
             // start | zM text info on LCD
-			if(currect_InteriorSign_text_index == 0) {
-				// length: 9
-				// Реклама 1
-				lcd.print(F("Reklama 1"));
-			} else if(currect_InteriorSign_text_index == 1) {
-				// length: 9
-				// Реклама 2
-				lcd.print(F("Reklama 2"));
-			} else if(currect_InteriorSign_text_index == 2) {
-				// length: 13
-				// Реклама яблук
-				lcd.print(F("Reklama iabluk"));
-			}
+            if(currect_InteriorSign_text_index == 0) {
+                // length: 9
+                // Реклама 1
+                lcd.print(F("Reklama 1"));
+            } else if(currect_InteriorSign_text_index == 1) {
+                // length: 9
+                // Реклама 2
+                lcd.print(F("Reklama 2"));
+            } else if(currect_InteriorSign_text_index == 2) {
+                // length: 13
+                // Реклама яблук
+                lcd.print(F("Reklama iabluk"));
+            }
             // end | zM text info on LCD
             lcd.setCursor(0,0);
             lcd.print(F("Cycle "));
@@ -213,19 +213,19 @@ void updateMenu(bool state_changed = false) {
             lcd.clear();
             lcd.setCursor(0,0);
             // start | zM text info on LCD
-			if(currect_InteriorSign_text_index == 0) {
-				// length: 9
-				// Реклама 1
-				lcd.print(F("Reklama 1"));
-			} else if(currect_InteriorSign_text_index == 1) {
-				// length: 9
-				// Реклама 2
-				lcd.print(F("Reklama 2"));
-			} else if(currect_InteriorSign_text_index == 2) {
-				// length: 13
-				// Реклама яблук
-				lcd.print(F("Reklama iabluk"));
-			}
+            if(currect_InteriorSign_text_index == 0) {
+                // length: 9
+                // Реклама 1
+                lcd.print(F("Reklama 1"));
+            } else if(currect_InteriorSign_text_index == 1) {
+                // length: 9
+                // Реклама 2
+                lcd.print(F("Reklama 2"));
+            } else if(currect_InteriorSign_text_index == 2) {
+                // length: 13
+                // Реклама яблук
+                lcd.print(F("Reklama iabluk"));
+            }
             // end | zM text info on LCD
             break;
         case 99:
@@ -840,35 +840,37 @@ void loop() {
 
         updateIBIS_dateNtime = false;
     }
-        
-    if(updateIBIS_zM) {
-        // start of the zM command sending
-		if(currect_InteriorSign_text_index == 0) {
-			// length: 13
-			// Перша реклама
-			IBIS_zM(F("Per\\a reklama"));
-		} else if(currect_InteriorSign_text_index == 1) {
-			// length: 24
-			// Друга реклама (текстова)
-			IBIS_zM(F("Druga reklama (tekstova)"));
-		} else if(currect_InteriorSign_text_index == 2) {
-			// length: 53
-			// Продаємо яблуки. Замовляйте по телефону 097 123 56 37
-			IBIS_zM(F("Proda~mo %bluki. Zamovl%jte po telefonu 097 123 56 37"));
-		}
-        // end of the zM command sending
-
-        updateIBIS_zM = false;
-    }
-
-    if(loop_interior_sign_texts) {
-        if(millis() - loop_zM_timer >= INTERIOR_SIGN_TEXT_CHANGE_DELAY) {
-            currect_InteriorSign_text_index < number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index++ : currect_InteriorSign_text_index = 0;
-            updateIBIS_zM = true;
-            if(state == 10) {
-                updateMenu(true);
+    
+    if(cycle_number != 0) { 
+        if(updateIBIS_zM) {
+            // start of the zM command sending
+            if(currect_InteriorSign_text_index == 0) {
+                // length: 13
+                // Перша реклама
+                IBIS_zM(F("Per\\a reklama"));
+            } else if(currect_InteriorSign_text_index == 1) {
+                // length: 24
+                // Друга реклама (текстова)
+                IBIS_zM(F("Druga reklama (tekstova)"));
+            } else if(currect_InteriorSign_text_index == 2) {
+                // length: 53
+                // Продаємо яблуки. Замовляйте по телефону 097 123 56 37
+                IBIS_zM(F("Proda~mo %bluki. Zamovl%jte po telefonu 097 123 56 37"));
             }
-            loop_zM_timer = millis();
+            // end of the zM command sending
+
+            updateIBIS_zM = false;
+        }
+
+        if(loop_interior_sign_texts) {
+            if(millis() - loop_zM_timer >= INTERIOR_SIGN_TEXT_CHANGE_DELAY) {
+                currect_InteriorSign_text_index < number_of_interiorSign_texts - 1 ? currect_InteriorSign_text_index++ : currect_InteriorSign_text_index = 0;
+                updateIBIS_zM = true;
+                if(state == 10) {
+                    updateMenu(true);
+                }
+                loop_zM_timer = millis();
+            }
         }
     }
 }
