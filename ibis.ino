@@ -4,6 +4,20 @@ void IBIS_init() {
     while (!Serial);
 }
 
+unsigned char calculateParity(String& text, unsigned char starting_checksum = 0x72) { 
+    // starting chechsums are:
+    // 0x72 -- default(no command) (0x0d ^ 0x7f = 0x72)
+    // 0x65 -- 'zM '
+    // 0x1e -- 'l'
+    // 0x08 -- 'z'
+    // 0x07 -- 'u'
+    // 0x04 -- 'v'
+    for (int i = 0; i < text.length(); i++) {
+        starting_checksum ^= (unsigned char)text[i];
+    }
+    return starting_checksum;
+}
+
 String three_digit_str(uint16_t num) {
     if(num < 10) {
         return "00" + String(num);
@@ -35,7 +49,11 @@ void IBIS_v(String text) {
 }
 
 void IBIS_zM(String text) {
-    IBIS_sendTelegram("zM "+text);
+    unsigned char parity = calculateParity(text, 0x65);
+    Serial.print("zM ");
+    Serial.print(text);
+    Serial.write(0x0d);
+    Serial.write(parity);
 }
 
 // copied from https://github.com/open-itcs/onboard-panel-arduino
@@ -91,15 +109,6 @@ String IBIS_wrapTelegram(String telegram) {
     telegram += " ";
     telegram.setCharAt(telegram.length() - 1, checksum); // seriously fuck that
     return telegram;
-}
-
-uint8_t calculateParity(String telegram) {
-    telegram += '\x0d';
-    unsigned char checksum = 0x7F;
-    for (int i = 0; i < telegram.length(); i++) {
-        checksum ^= (unsigned char)telegram[i];
-    }
-    return checksum;
 }
 
 void IBIS_sendTelegram(String telegram) {
